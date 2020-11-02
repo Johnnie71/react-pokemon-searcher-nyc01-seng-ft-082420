@@ -8,7 +8,8 @@ class PokemonPage extends React.Component {
 
   state= {
     api:[],
-    apiCopy: []
+    apiCopy: [],
+    value: ""
   }
 
   componentDidMount(){
@@ -17,17 +18,54 @@ class PokemonPage extends React.Component {
     .then(data => this.setState({api: data, apiCopy: data}))
   }
 
+  searchHandler = (e) => {
+    let typedValue = e.target.value
+    this.setState(() => ({value: typedValue}))
+    // console.log(this.state.value)
+  }
+
+  filter = () =>{
+    return this.state.apiCopy.filter(poke => poke.name.toLowerCase().includes(this.state.value.toLowerCase()))
+  }
+
+  submitHandler = (newPoke) =>{
+    
+    let newPokemon = {
+      name: newPoke.name,
+      hp: newPoke.hp,
+      sprites: {
+        front: newPoke.front,
+        back: newPoke.back
+      }
+    }
+
+     let options = {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "accept": "application/json"
+      },
+      body: JSON.stringify(newPokemon)
+    }
+
+    fetch("http://localhost:3000/pokemon/", options)
+    .then(resp => resp.json())
+    .then(pokemon => this.setState({ apiCopy: [pokemon, ...this.state.apiCopy] }))
+  }
+
+
+
   render() {
 
     return (
       <Container>
         <h1>Pokemon Searcher</h1>
         <br />
-        <PokemonForm />
+        <PokemonForm submitHandler={this.submitHandler} />
         <br />
-        <Search />
+        <Search searchHandler={this.searchHandler} searchVal={this.state.value}/>
         <br />
-        <PokemonCollection pokemon={this.state.apiCopy}/>
+        <PokemonCollection pokemon={this.filter()}/>
       </Container>
     )
   }

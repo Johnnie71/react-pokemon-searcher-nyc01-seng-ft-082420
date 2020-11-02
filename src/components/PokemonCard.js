@@ -17,8 +17,6 @@ class PokemonCard extends React.Component {
   
   render() {
     let pokemon  = this.props.pokemon
-    
-    // console.log(frontCard, backCard)
 
     return (
       <Card>
